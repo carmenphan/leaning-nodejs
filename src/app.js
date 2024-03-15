@@ -11,16 +11,10 @@ app.use(helmet());
 app.use(compression())
 // init db
 require('./dbs/init.mongodb')
-const { checkOverload } = require('./helpers/check.connect')
 //checkOverload()
 // init routes
-app.get('/' , (req , res , next) => {
-    const strCompress = 'hello cuongpt';
-    return res.status(200).json({
-        message : 'welcome to cuongphan',
-        compress : strCompress.repeat(10000)
-    })
-})
+
+app.use('',require('./routes'));
 
 
 // handling error
