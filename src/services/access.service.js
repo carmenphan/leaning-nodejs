@@ -33,7 +33,7 @@ class AccessService {
                 const {privateKey , publicKey} = crypto.generateKeyPairSync('rsa',{
                     modulusLength : 4096
                 })
-                console.log({privateKey , publicKey});''
+                console.log({privateKey , publicKey});
             }
 
         }catch (error) {
