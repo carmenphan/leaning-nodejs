@@ -9,6 +9,8 @@ const app   = express()
 app.use(morgan('dev'));
 app.use(helmet());
 app.use(compression())
+app.use(express.urlencoded({ extended: true }))
+app.use(express.json({ extended: true }))
 // init db
 require('./dbs/init.mongodb')
 //checkOverload()

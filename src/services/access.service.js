@@ -2,6 +2,10 @@
 
 const shopModel = require("../models/shop.model");
 const bcrypt =  require('bcrypt')
+const crypto = require("crypto");
+const KeyTokenService = require('./keyToken.service');
+const { createTokenPair } = require("../auth/authUtils");
+const { getInfoData } = require("../utils");
 const RoleShop = {
     SHOP : 'shop',
     WRITER : 'WRITER',
@@ -31,9 +35,41 @@ class AccessService {
             if (newShop){
                 // created privateKey , publicKey
                 const {privateKey , publicKey} = crypto.generateKeyPairSync('rsa',{
-                    modulusLength : 4096
+                    modulusLength : 4096,
+                    publicKeyEncoding : {
+                        type : 'pkcs1',
+                        format : 'pem'
+                    },
+                    privateKeyEncoding : {
+                        type : 'pkcs1',
+                        format : 'pem'
+                    }
                 })
                 console.log({privateKey , publicKey});
+                const publicKeyString = await KeyTokenService.createKeyToken({userId : newShop._id ,publicKey : publicKey })
+                if (!publicKeyString){
+                    return {
+                        code : 'xxxx',
+                        message : 'publicKeyString error'
+                    }
+                }
+                console.log(`public key string :: ` , publicKeyString)
+                const publicKeyObject = crypto.createPublicKey(publicKeyString)
+                console.log(`public key object :: `,publicKeyObject )
+                // create token pair
+                const tokens = await createTokenPair({userId : newShop._id , email} , publicKeyObject , privateKey);
+                console.log(tokens)
+                return {
+                    code : '201',
+                    meteData  : {
+                        shop : getInfoData({fields : ['_id' ,'name' , 'email'] , object : newShop}), 
+                        tokens : tokens
+                    }
+                }
+            }
+            return {
+                code : '200',
+                meteData  :null
             }
 
         }catch (error) {
