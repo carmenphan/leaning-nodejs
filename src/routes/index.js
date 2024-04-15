@@ -6,7 +6,7 @@ const {apiKey , permission} = require('../auth/checkAuth')
 router.use(apiKey)
 
 // check permission
-router.use(permission('1111'))
+router.use(permission('0000'))
 router.use('/v1/api',require('./access'))
 
 // router.get('' , (req , res , next) => {

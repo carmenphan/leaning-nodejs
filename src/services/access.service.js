@@ -6,13 +6,48 @@ const crypto = require("crypto");
 const KeyTokenService = require('./keyToken.service');
 const { createTokenPair } = require("../auth/authUtils");
 const { getInfoData } = require("../utils");
+const { findByEmail } = require('../services/shop.service');
+const { BadRequestError, AuthFailureError } = require('../core/error.response');
 const RoleShop = {
     SHOP : 'shop',
     WRITER : 'WRITER',
     EDITOR : 'EDITOR',
     ADMIN : 'ADMIN'
 }
+
 class AccessService {
+
+
+    /*
+     * 1- check email in dbs
+     * 2 - match password 
+     * 3 - create Accesstoken , Refesh token 
+     * 4 - gennerate tokens
+     * 5 - get data return login 
+     */
+    login = async ({email , password , resfeshToken = null}) => {
+        // 1 - check email in db 
+        const foundShop = await findByEmail({email});
+        if (!foundShop) throw new BadRequestError('Shop Not registered ');
+        // 2 - match password
+        const match = bcrypt.compare(password , foundShop.password );
+        if ( !match ) throw new AuthFailureError('Authentication error');
+        // 3 - generate token 
+        const privateKey = crypto.randomBytes(64).toString('hex');
+        const publicKey = crypto.randomBytes(64).toString('hex'); 
+        
+        // 4 - generate token
+        const tokens = await createTokenPair({userId : newShop._id , email} , publicKey , privateKey);
+        await KeyTokenService.createKeyToken({
+            refreshToken : tokens.resfeshToken,
+            privateKey , publicKey
+        })
+        return {
+            shop : getInfoData({fields : ['_id' ,'name' , 'email'] , object : foundShop}), 
+            tokens : tokens
+        }
+    }
+    
     static signUp = async ({name, email , password }) => {
         try{
             // step1 check edmail exist 
@@ -20,10 +55,7 @@ class AccessService {
 
             const hodelShop = await shopModel.findOne({email}).lean();
             if (hodelShop){
-                return {
-                    code : 'xxxx',
-                    message : 'shop already register'
-                }
+               throw new BadRequestError('Error : Shop already Register')
             }
             // step2 hashPass
             const passwordHash = await bcrypt.hash(password , 10);
@@ -54,10 +86,7 @@ class AccessService {
                     privateKey : privateKey
                  })
                 if (!keyStore){
-                    return {
-                        code : 'xxxx',
-                        message : 'publicKeyString error'
-                    }
+                    throw new BadRequestError('publicKeyString error')
                 }
                // console.log(`public key string :: ` , publicKeyString)
                // const publicKeyObject = crypto.createPublicKey(publicKeyString)
@@ -79,11 +108,7 @@ class AccessService {
             }
 
         }catch (error) {
-            return {
-                code : 'xxx',
-                message : error.message,
-                status : 'error'
-            }
+            throw new BadRequestError(error.message)
         }
     }
 }
