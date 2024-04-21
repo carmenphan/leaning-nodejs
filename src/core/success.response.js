@@ -3,11 +3,13 @@
 
 const StatusCode = {
     OK : 200,
-    CREATED : 201
+    CREATED : 201,
+    ACCEPTED : 202,
 }
 const ReasonStatus = {
     CREATED : 'Created',
-    OK : 'Success'
+    OK : 'Success',
+    ACCEPTED : 'Accepted'
 }
 
 
