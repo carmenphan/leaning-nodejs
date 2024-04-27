@@ -3,7 +3,9 @@ const express = require('express');
 const productController = require('../../controllers/product.controller');
 const { asyncHandler } = require('../../auth/checkAuth');
 const router = express.Router();
-router.get('/search/:keySearch' , asyncHandler(productController.getListSearchProduct))\
+router.get('/search/:keySearch' , asyncHandler(productController.getListSearchProduct))
+router.get('' , asyncHandler(productController.findAllProducts));
+router.get('/:product_id' , asyncHandler(productController.findProduct));
 router.post('' , asyncHandler(productController.createProduct))
 router.post('publish/:product_id' , asyncHandler(productController.publishProductByShop))
 router.post('unpublish/:product_id' , asyncHandler(productController.unPublishProductByShop))

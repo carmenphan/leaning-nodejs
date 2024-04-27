@@ -57,5 +57,19 @@ class ProductController {
             metadata : await ProductService.searchProducts(req.params)
         }).send(res)
     }
+    findAllProducts = async (req , res , next) => {
+        new OK({
+            message : 'Products fetched',
+            metadata : await ProductService.findAllProducts(req.params)
+        }).send
+    }
+    findProduct = async (req , res , next) => {
+        new OK({
+            message : 'Product fetched',
+            metadata : await ProductService.findProduct({
+                product_id : req.params.product_id
+            })
+        }).send(res
+    }
 }
 modudle.exports = new ProductController();
