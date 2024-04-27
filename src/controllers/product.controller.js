@@ -69,7 +69,7 @@ class ProductController {
             metadata : await ProductService.findProduct({
                 product_id : req.params.product_id
             })
-        }).send(res
+        }).send(res)
     }
 }
 modudle.exports = new ProductController();
