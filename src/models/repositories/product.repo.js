@@ -41,6 +41,14 @@ const queryProduct = async ({query , limit = 50 , skip = 0}) => {
         .lean()
         .exec();
 }
+const updateProductById = async ({
+    product_id , bodyUpdate , model , isNew = 1
+}) => {
+    return await model.findByIdAndUpdate(product_id , bodyUpdate , {
+        new : isNew
+    })
+
+}
 
 const searchProductByUser = async ({keySearch}) => {
     const regexSeaerch = new RegExp(keySearch);
@@ -81,5 +89,6 @@ module.exports = {
     unPublishProductByShop,
     searchProductByUser,
     findAllProducts,
-    findProduct
+    findProduct,
+    updateProductById
 }
