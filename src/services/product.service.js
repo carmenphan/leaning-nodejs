@@ -11,6 +11,8 @@ const {
     findProduct
 } = require('../models/repositories/product.repo');
 const {removeUndefinedObject} = require('../utils/index');
+const {insertInventory} = require('../models/repositories/inventory.repo');
+
 class ProductFactory {
    // static async createProduct(type , payload){
    //     switch (type){
@@ -92,7 +94,15 @@ class Product {
         this.product_attributes = product_attributes;
     }
     async createProduct(product_id) {
-        return await product.create({...this , _id: product_id});
+        const newProduct = await product.create({...this , _id: product_id});
+        if (newProduct){
+            await insertInventory({
+                product_id,
+                shopId: this.product_shop,
+                stock: this.product_quantity
+            });
+        }
+        return newProduct;
     }
     async updateProduct(product_id , bodyUpdate) {
         return await updateProductById(product_id , bodyUpdate);
